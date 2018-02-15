@@ -122,7 +122,7 @@ func (a *Auth) authenticateAccessToken(req *rest.Request) (request.Details, erro
 		return nil, request.ErrorUnauthorized()
 	}
 
-	details, err := a.authClient.ValidateSessionToken(req.Context(), parts[1])
+	details, err := a.authClient.ValidateAccessToken(req.Context(), parts[1], []string{"tidepool:internal"})
 	if err != nil {
 		return nil, nil
 	}

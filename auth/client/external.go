@@ -4,6 +4,7 @@ import (
 	"context"
 	"net/http"
 	"strconv"
+	"strings"
 	"sync"
 	"time"
 
@@ -171,6 +172,31 @@ func (e *External) ValidateSessionToken(ctx context.Context, token string) (requ
 		UserID   string
 	}
 	if err := e.client.SendRequestAsServer(ctx, "GET", e.client.ConstructURL("auth", "token", token), nil, nil, &result); err != nil {
+		return nil, err
+	}
+
+	if result.IsServer {
+		result.UserID = ""
+	} else if result.UserID == "" {
+		return nil, errors.New("user id is missing")
+	}
+
+	return request.NewDetails(request.MethodSessionToken, result.UserID, token), nil
+}
+
+func (e *External) ValidateAccessToken(ctx context.Context, token string, scopes []string) (request.Details, error) {
+	if ctx == nil {
+		return nil, errors.New("context is missing")
+	}
+	if token == "" {
+		return nil, errors.New("token is missing")
+	}
+
+	var result struct {
+		IsServer bool
+		UserID   string
+	}
+	if err := e.client.SendRequestAsServer(ctx, "GET", e.client.ConstructURL("auth", "token", token, strings.Join(scopes, ",")), nil, nil, &result); err != nil {
 		return nil, err
 	}
 
