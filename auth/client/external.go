@@ -206,7 +206,7 @@ func (e *External) ValidateAccessToken(ctx context.Context, token string, scopes
 		return nil, errors.New("user id is missing")
 	}
 
-	return request.NewDetails(request.MethodSessionToken, result.UserID, token), nil
+	return request.NewDetails(request.MethodAccessToken, result.UserID, token), nil
 }
 
 func (e *External) timeoutServerSessionToken(serverSessionTokenTimeout time.Duration) time.Duration {

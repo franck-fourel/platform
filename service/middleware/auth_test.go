@@ -211,8 +211,8 @@ var _ = Describe("Auth", func() {
 
 					It("returns successfully", func() {
 						userID := id.New()
-						authClient.ValidateSessionTokenOutputs = []testAuth.ValidateSessionTokenOutput{
-							{Details: request.NewDetails(request.MethodSessionToken, userID, accessToken), Error: nil},
+						authClient.ValidateAccessTokenOutputs = []testAuth.ValidateAccessTokenOutput{
+							{Details: request.NewDetails(request.MethodAccessToken, userID, accessToken), Error: nil},
 						}
 						handlerFunc = func(res rest.ResponseWriter, req *rest.Request) {
 							details := request.DetailsFromContext(req.Context())
@@ -228,12 +228,12 @@ var _ = Describe("Auth", func() {
 							Expect(service.GetRequestLogger(req)).ToNot(Equal(lgr))
 						}
 						middlewareFunc(res, req)
-						Expect(authClient.ValidateSessionTokenInputs).To(HaveLen(1))
-						Expect(authClient.ValidateSessionTokenInputs[0].Token).To(Equal(accessToken))
+						Expect(authClient.ValidateAccessTokenInputs).To(HaveLen(1))
+						Expect(authClient.ValidateAccessTokenInputs[0].Token).To(Equal(accessToken))
 					})
 
 					It("returns successfully with no details if access token is not valid", func() {
-						authClient.ValidateSessionTokenOutputs = []testAuth.ValidateSessionTokenOutput{{Details: nil, Error: testErrors.NewError()}}
+						authClient.ValidateAccessTokenOutputs = []testAuth.ValidateAccessTokenOutput{{Details: nil, Error: testErrors.NewError()}}
 						handlerFunc = func(res rest.ResponseWriter, req *rest.Request) {
 							details := request.DetailsFromContext(req.Context())
 							Expect(details).To(BeNil())
@@ -242,8 +242,8 @@ var _ = Describe("Auth", func() {
 							Expect(service.GetRequestLogger(req)).To(Equal(lgr))
 						}
 						middlewareFunc(res, req)
-						Expect(authClient.ValidateSessionTokenInputs).To(HaveLen(1))
-						Expect(authClient.ValidateSessionTokenInputs[0].Token).To(Equal(accessToken))
+						Expect(authClient.ValidateAccessTokenInputs).To(HaveLen(1))
+						Expect(authClient.ValidateAccessTokenInputs[0].Token).To(Equal(accessToken))
 					})
 				})
 

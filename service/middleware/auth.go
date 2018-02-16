@@ -127,7 +127,7 @@ func (a *Auth) authenticateAccessToken(req *rest.Request) (request.Details, erro
 		return nil, nil
 	}
 
-	return request.NewDetails(request.MethodAccessToken, details.UserID(), details.Token()), nil
+	return details, nil
 }
 
 func (a *Auth) authenticateSessionToken(req *rest.Request) (request.Details, error) {

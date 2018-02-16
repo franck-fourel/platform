@@ -24,6 +24,17 @@ type ValidateSessionTokenOutput struct {
 	Error   error
 }
 
+type ValidateAccessTokenInput struct {
+	Context context.Context
+	Token   string
+	Scopes  []string
+}
+
+type ValidateAccessTokenOutput struct {
+	Details request.Details
+	Error   error
+}
+
 type ExternalAccessor struct {
 	*test.Mock
 	ServerSessionTokenInvocations   int
@@ -31,6 +42,9 @@ type ExternalAccessor struct {
 	ValidateSessionTokenInvocations int
 	ValidateSessionTokenInputs      []ValidateSessionTokenInput
 	ValidateSessionTokenOutputs     []ValidateSessionTokenOutput
+	ValidateAccessTokenInvocations  int
+	ValidateAccessTokenInputs       []ValidateAccessTokenInput
+	ValidateAccessTokenOutputs      []ValidateAccessTokenOutput
 }
 
 func NewExternalAccessor() *ExternalAccessor {
@@ -61,8 +75,21 @@ func (e *ExternalAccessor) ValidateSessionToken(ctx context.Context, token strin
 	return output.Details, output.Error
 }
 
+func (e *ExternalAccessor) ValidateAccessToken(ctx context.Context, token string, scopes []string) (request.Details, error) {
+	e.ValidateAccessTokenInvocations++
+
+	e.ValidateAccessTokenInputs = append(e.ValidateAccessTokenInputs, ValidateAccessTokenInput{Context: ctx, Token: token, Scopes: scopes})
+
+	gomega.Expect(e.ValidateAccessTokenOutputs).ToNot(gomega.BeEmpty())
+
+	output := e.ValidateAccessTokenOutputs[0]
+	e.ValidateAccessTokenOutputs = e.ValidateAccessTokenOutputs[1:]
+	return output.Details, output.Error
+}
+
 func (e *ExternalAccessor) Expectations() {
 	e.Mock.Expectations()
 	gomega.Expect(e.ServerSessionTokenOutputs).To(gomega.BeEmpty())
 	gomega.Expect(e.ValidateSessionTokenOutputs).To(gomega.BeEmpty())
+	gomega.Expect(e.ValidateAccessTokenOutputs).To(gomega.BeEmpty())
 }
